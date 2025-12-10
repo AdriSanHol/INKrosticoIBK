@@ -83,7 +83,7 @@ button:hover {
 }
 
 .letra {
-  top: 12px; 
+  top: 24px; 
   position: relative;
   z-index: 10;
   width: 70px;
