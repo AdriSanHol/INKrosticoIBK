@@ -16,7 +16,7 @@ body {
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 550px; /* Aumentado ligeramente para mejor visualización */
+  max-width: 850px; /* Aumentado ligeramente para mejor visualización */
 }
 
 h1 {
@@ -71,19 +71,21 @@ button:hover {
 #acrostico {
   display: flex;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px;
+  flex-wrap: nowrap; /* evita que se vayan abajo */
+  gap: 14px;
+  overflow-x: auto; /* por si en pantallas chicas no entra */
+  padding-bottom: 10px;
 }
 
 .letra {
-  width: 60px;
-  height: 60px;
+  width: 70px;
+  height: 70px;
   background: #d9f5e5;
   border-radius: 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 32px;
+  font-size: 38px;
   font-weight: bold;
   cursor: pointer;
   transition: transform 0.3s ease, background 0.3s ease;
