@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuestro Compromiso Interbank 2026</title>
+  <link rel="stylesheet" href="main.css" />
+</head>
+<body>
+  <div class="container" id="inicio">
+    <h1>Juego Interbank 2026</h1>
+
+    <label for="representante">Nombre del representante:</label>
+    <input
+      type="text"
+      id="representante"
+      placeholder="Ingresa tu nombre"
+    />
+
+    <label for="equipo">Nombre del equipo:</label>
+    <input
+      type="text"
+      id="equipo"
+      placeholder="Ej: Los Visionarios"
+    />
+
+    <label for="vp">Selecciona tu VP:</label>
+    <select id="vp">
+      <option value="Finanzas">VP Finanzas</option>
+      <option value="GDH">VP GDH</option>
+      <option value="Operaciones">VP Operaciones</option>
+      <option value="Comercial">VP Comercial</option>
+    </select>
+
+    <button onclick="startGame()">Ingresar al juego</button>
+
+    <div class="instrucciones">
+      <strong>Instrucciones:</strong><br />
+      Este juego es un acróstico con colores Interbank. Tu equipo deberá formar la palabra
+      <strong>INTERBANK</strong> y completar su compromiso como equipo al 2026, asegurándose de que cada frase
+      empiece con la letra asignada.
+    </div>
+  </div>
+
+  <div class="container" id="juego" style="display: none; text-align: center">
+    <h1 style="color: #009a44">Acróstico INTERBANK</h1>
+    <p id="bienvenidaMsg"></p>
+
+    <div id="acrostico" style="margin-top: 20px">
+      <div class="letra" data-letter="I">I</div>
+      <div class="letra" data-letter="N1">N</div>
+      <div class="letra" data-letter="T">T</div>
+      <div class="letra" data-letter="E">E</div>
+      <div class="letra" data-letter="R">R</div>
+      <div class="letra" data-letter="B">B</div>
+      <div class="letra" data-letter="A">A</div>
+      <div class="letra" data-letter="N2">N</div>
+      <div class="letra" data-letter="K">K</div>
+    </div>
+
+    <p style="margin-top: 15px; font-size: 14px">
+      Haz clic en cada letra para completar el compromiso 2026.
+    </p>
+
+    <div id="editor" style="margin-top: 20px; display: none">
+      <h3 id="editorTitulo" style="color: #333; margin-bottom: 10px;"></h3>
+      <textarea
+        id="textoLetra"
+        style="width: 100%; height: 80px; border-radius: 10px; padding: 10px"
+        placeholder="Escribe el compromiso que inicia con esta letra..."
+      ></textarea>
+      <button style="margin-top: 10px" onclick="guardarLetra()">Guardar Compromiso</button>
+    </div>
+  </div>
+
+  <div class="container" id="final" style="display: none; text-align: center">
+    <h1 style="color: #009a44">¡Compromiso 2026 Completado!</h1>
+    <p>
+      <strong>Equipo <span id="equipoFinal"></span></strong> de
+      <strong>VP <span id="vpFinal"></span></strong>
+    </p>
+
+    <div class="content-wrapper">
+      <div id="resultadoFinal"></div>
+
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <video
+          id="camara"
+          autoplay
+          playsinline
+        ></video>
+
+        <button onclick="tomarFoto()" style="margin-top: 10px; max-width: 250px">
+          Tomar foto
+        </button>
+
+        <canvas id="fotoCanvas" style="display: none"></canvas>
+
+        <img
+          id="fotoTomada"
+          style="
+            margin-top: 15px;
+            width: 100%;
+            max-width: 250px;
+            display: none;
+            border-radius: 8px;
+            border: 2px solid #009a44;
+          "
+          alt="Foto del equipo"
+        />
+      </div>
+    </div>
+
+    <button onclick="volverAlJuego()" style="margin-top: 30px; background: #333;">
+      Volver a editar
+    </button>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

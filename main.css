@@ -1,0 +1,141 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Usar min-height para que funcione en pantallas pequeñas */
+  color: #333;
+}
+
+.container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 550px; /* Aumentado ligeramente para mejor visualización */
+}
+
+h1 {
+  color: #009a44;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+label {
+  font-weight: bold;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  margin-top: 6px;
+  margin-bottom: 16px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  box-sizing: border-box; /* Asegura que padding no afecte el ancho total */
+}
+
+button {
+  width: 100%;
+  background: #009a44;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #007b37;
+}
+
+.instrucciones {
+  background: #e6f4ec;
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 15px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Estilos del Acróstico */
+#acrostico {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.letra {
+  width: 60px;
+  height: 60px;
+  background: #d9f5e5;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 32px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.3s ease, background 0.3s ease;
+  color: #009a44; /* Color inicial de la letra */
+}
+
+.letra:hover {
+  transform: scale(1.15);
+}
+
+.letra.completa {
+  background: #009a44;
+  color: white;
+  transform: scale(1.1) rotate(3deg);
+}
+
+/* Estilos de la pantalla final */
+#final .content-wrapper {
+  display: flex;
+  flex-direction: column; /* Columna en pantallas pequeñas */
+  align-items: center;
+  margin-top: 20px;
+  gap: 30px;
+}
+
+#resultadoFinal {
+  font-size: 16px;
+  line-height: 2;
+  text-align: left;
+  min-width: 200px;
+  flex-grow: 1;
+  padding-bottom: 20px;
+}
+
+#camara {
+  width: 100%;
+  max-width: 250px;
+  height: 200px;
+  background: #000;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+/* Media query para pantallas más grandes (desktops) */
+@media (min-width: 600px) {
+  #final .content-wrapper {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-around;
+  }
+
+  #camara {
+    height: 320px;
+  }
+}
