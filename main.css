@@ -126,6 +126,53 @@ button:hover {
   border-radius: 8px;
   object-fit: cover;
 }
+/* Mejorar el espacio del acróstico vertical */
+#resultadoFinal {
+  font-size: 18px;        /* más grande */
+  line-height: 2.2;       /* más aire entre líneas */
+  text-align: left;
+  padding: 20px;
+  max-width: 350px;       /* más ancho */
+}
+
+/* Hacer las letras del resumen más grandes y fuertes */
+#resultadoFinal strong {
+  font-size: 22px;
+  font-weight: 700;
+  color: #009a44;
+}
+
+/* Foto más grande */
+#fotoTomada {
+  width: 100%;
+  max-width: 350px;      /* antes 250 */
+  border-radius: 12px;
+}
+
+/* Colocar cámara y foto al costado en pantallas grandes */
+@media (min-width: 650px) {
+  .camera-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  #final .content-wrapper {
+    flex-direction: row;          /* lado a lado */
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  #camara {
+    width: 300px;
+    height: 250px;
+  }
+
+  #fotoTomada {
+    max-width: 300px;
+  }
+}
 
 /* Media query para pantallas más grandes (desktops) */
 @media (min-width: 600px) {
