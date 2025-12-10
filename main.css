@@ -78,7 +78,6 @@ button:hover {
   justify-content: center;
   flex-wrap: nowrap;      /* Que no se bajen */
   gap: 14px;
-  overflow-x: auto;       /* Por si pantalla pequeña */
   padding-bottom: 10px;
 }
 
