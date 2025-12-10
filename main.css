@@ -77,7 +77,15 @@ button:hover {
   padding-bottom: 10px;
 }
 
+#editor[style*="none"] {
+  height: 0 !important;
+  overflow: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+}
 .letra {
+  position: relative;
+  z-index: 10; 
   width: 70px;
   height: 70px;
   background: #d9f5e5;
