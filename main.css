@@ -1,3 +1,6 @@
+/* -------------------------------------------------
+   1) ESTILOS BASE
+------------------------------------------------- */
 body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
@@ -6,7 +9,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh; /* Usar min-height para que funcione en pantallas pequeñas */
+  min-height: 100vh;
   color: #333;
 }
 
@@ -16,7 +19,7 @@ body {
   border-radius: 16px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   width: 100%;
-  max-width: 850px; /* Aumentado ligeramente para mejor visualización */
+  max-width: 850px;
 }
 
 h1 {
@@ -39,7 +42,7 @@ textarea {
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 14px;
-  box-sizing: border-box; /* Asegura que padding no afecte el ancho total */
+  box-sizing: border-box;
 }
 
 button {
@@ -67,25 +70,21 @@ button:hover {
   line-height: 1.5;
 }
 
-/* Estilos del Acróstico */
+/* -------------------------------------------------
+   2) ACRÓSTICO
+------------------------------------------------- */
 #acrostico {
   display: flex;
   justify-content: center;
-  flex-wrap: nowrap; /* evita que se vayan abajo */
+  flex-wrap: nowrap;      /* Que no se bajen */
   gap: 14px;
-  overflow-x: auto; /* por si en pantallas chicas no entra */
+  overflow-x: auto;       /* Por si pantalla pequeña */
   padding-bottom: 10px;
 }
 
-#editor[style*="none"] {
-  height: 0 !important;
-  overflow: hidden;
-  padding: 0 !important;
-  margin: 0 !important;
-}
 .letra {
   position: relative;
-  z-index: 10; 
+  z-index: 10;
   width: 70px;
   height: 70px;
   background: #d9f5e5;
@@ -97,7 +96,7 @@ button:hover {
   font-weight: bold;
   cursor: pointer;
   transition: transform 0.3s ease, background 0.3s ease;
-  color: #009a44; /* Color inicial de la letra */
+  color: #009a44;
 }
 
 .letra:hover {
@@ -110,24 +109,46 @@ button:hover {
   transform: scale(1.1) rotate(3deg);
 }
 
-/* Estilos de la pantalla final */
+/* Ocultar el editor sin dejar espacio */
+#editor[style*="none"] {
+  height: 0 !important;
+  overflow: hidden;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* -------------------------------------------------
+   3) PANTALLA FINAL (RESUMEN)
+------------------------------------------------- */
 #final .content-wrapper {
   display: flex;
-  flex-direction: column; /* Columna en pantallas pequeñas */
+  flex-direction: column;
   align-items: center;
   margin-top: 20px;
   gap: 30px;
 }
 
+/* Acróstico vertical */
 #resultadoFinal {
-  font-size: 16px;
-  line-height: 2;
+  font-size: 18px;
+  line-height: 2.2;
   text-align: left;
+  padding: 20px;
+  max-width: 350px;
   min-width: 200px;
   flex-grow: 1;
-  padding-bottom: 20px;
 }
 
+/* Letra del acróstico vertical */
+#resultadoFinal strong {
+  font-size: 22px;
+  font-weight: 700;
+  color: #009a44;
+}
+
+/* -------------------------------------------------
+   4) CÁMARA Y FOTO
+------------------------------------------------- */
 #camara {
   width: 100%;
   max-width: 250px;
@@ -136,40 +157,21 @@ button:hover {
   border-radius: 8px;
   object-fit: cover;
 }
-/* Mejorar el espacio del acróstico vertical */
-#resultadoFinal {
-  font-size: 18px;        /* más grande */
-  line-height: 2.2;       /* más aire entre líneas */
-  text-align: left;
-  padding: 20px;
-  max-width: 350px;       /* más ancho */
-}
 
-/* Hacer las letras del resumen más grandes y fuertes */
-#resultadoFinal strong {
-  font-size: 22px;
-  font-weight: 700;
-  color: #009a44;
-}
-
-/* Foto más grande */
 #fotoTomada {
   width: 100%;
-  max-width: 350px;      /* antes 250 */
+  max-width: 350px;
   border-radius: 12px;
 }
 
-/* Colocar cámara y foto al costado en pantallas grandes */
+/* -------------------------------------------------
+   5) MEDIA QUERIES
+------------------------------------------------- */
 @media (min-width: 650px) {
-  .camera-side {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-  }
 
+  /* Cámara y foto al costado */
   #final .content-wrapper {
-    flex-direction: row;          /* lado a lado */
+    flex-direction: row;
     align-items: flex-start;
     justify-content: space-between;
   }
@@ -184,14 +186,7 @@ button:hover {
   }
 }
 
-/* Media query para pantallas más grandes (desktops) */
-@media (min-width: 600px) {
-  #final .content-wrapper {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-around;
-  }
-
+@media (min-width: 900px) {
   #camara {
     height: 320px;
   }
