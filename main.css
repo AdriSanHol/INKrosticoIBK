@@ -19,7 +19,8 @@ body {
   border-radius: 16px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
   width: 100%;
-  max-width: 900px;
+  /* Aumentado de 900px a 1150px para dar espacio al resumen + (350+350+20) de fotos */
+  max-width: 1150px; 
 }
 
 /* Caja del propósito */
@@ -94,9 +95,9 @@ button:hover {
 #acrostico {
   display: flex;
   justify-content: center;
-  flex-wrap: nowrap; /* Que no se bajen */
+  flex-wrap: nowrap;
   gap: 14px;
-  overflow-x: auto; /* Por si pantalla pequeña */
+  overflow-x: auto;
   padding: 20px 10px;
 }
 
@@ -163,35 +164,43 @@ button:hover {
 }
 
 /* -------------------------------------------------
-    4) CÁMARA Y FOTO (AHORA ES UN WRAPPER DE DOBLE COLUMNA PARA LA CÁMARA/FOTO)
+    4) CÁMARA Y FOTO (CON MARCO)
 ------------------------------------------------- */
 .camera-container {
-    /* Nuevo contenedor para agrupar Cámara y Foto */
     display: flex;
-    flex-direction: column; /* Apilado por defecto en móvil */
+    flex-direction: column; 
     gap: 20px;
     width: 100%;
-    max-width: 400px; /* Limitar el ancho total en móvil */
+    max-width: 500px; 
 }
 
-/* Estilo para los wrappers individuales (cámara y foto) */
 .camera-wrapper, .foto-display {
+    position: relative; 
     display: flex;
     flex-direction: column;
     gap: 15px;
     align-items: center;
 }
 
-/* Estilo común para el video/foto en móvil (un solo cuadrado) */
+/* Estilo común para el video/foto en móvil (Tamaño Aumentado) */
 #camara, #fotoTomada {
     width: 100%;
-    height: 250px;
+    height: 300px; 
     border-radius: 10px;
     object-fit: cover;
 }
 
-#fotoTomada {
-    margin-top: 0; /* Asegurar que no haya margen extra */
+/* El marco se superpone a la imagen tomada */
+#marcoOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 300px; 
+    z-index: 30; 
+    border-radius: 10px;
+    pointer-events: none; 
+    display: none; 
 }
 
 
@@ -208,37 +217,40 @@ button:hover {
 
   /* Estructura Interna: Cámara | Foto */
   .camera-container {
-    flex-direction: row; /* Cámara y foto una al lado de la otra */
+    flex-direction: row;
     gap: 20px;
-    /* Ancho: 200px (Cámara) + 200px (Foto) + 20px (Gap) = 420px */
-    width: 420px; 
-    max-width: 420px; 
+    /* Mantiene el tamaño fijo de los dos cuadrados: 720px */
+    width: 720px; 
+    max-width: 720px; 
     align-items: flex-start;
+    flex-shrink: 0; /* No se encoge */
   }
 
-  /* Contenedores de 200px para la cámara y la foto */
+  /* Contenedores individuales para la cámara y la foto */
   .camera-wrapper, .foto-display {
-      width: 200px; 
-      min-width: 200px;
+      width: 350px; 
+      min-width: 350px;
       height: auto;
-      /* Asegurar que el botón de tomar foto no tenga width: 100% del container */
   }
 
-  /* El video y la foto deben ser cuadrados de 200px */
-  #camara, #fotoTomada {
-    width: 200px;
-    height: 200px;
+  /* El video, la foto y el marco deben ser cuadrados */
+  #camara, #fotoTomada, #marcoOverlay {
+    width: 350px;
+    height: 350px;
   }
   
-  /* El botón dentro del wrapper de 200px debe ocupar ese ancho */
+  /* El botón dentro del wrapper debe ocupar ese ancho */
   .camera-wrapper button, .foto-display button {
-      width: 100%; /* Ocupa los 200px del contenedor padre */
+      width: 100%;
       margin-top: 0;
   }
 
-  /* El resultado final (acróstico) ocupa el espacio restante */
+  /* El resultado final (acróstico) es flexible */
   #resultadoFinal {
-    max-width: 450px;
+    /* Permitimos que el resumen ocupe el espacio restante */
+    max-width: 400px; /* Damos un ancho máximo para que no se estire demasiado */
+    flex-grow: 1;
     padding: 15px 0;
+    min-width: 350px; /* Aseguramos un ancho mínimo suficiente */
   }
 }

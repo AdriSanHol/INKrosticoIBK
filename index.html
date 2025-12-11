@@ -86,13 +86,16 @@
         
         <div class="camera-wrapper">
           <video id="camara" autoplay playsinline></video>
-          <canvas id="fotoCanvas" style="display:none"></canvas>
+          <canvas id="fotoCanvas" style="display:none"></canvas> 
           <button id="btnFoto" onclick="tomarFoto()">Tomar foto</button>
         </div>
 
         <div class="foto-display" id="fotoDisplay" style="display:none;">
             <img id="fotoTomada" alt="Foto del equipo" />
-            <button id="btnDescargar" onclick="descargarFoto()">Descargar Foto</button>
+            <img id="marcoOverlay" src="marcos.png" alt="Marco" style="display:none;" />
+            
+            <button id="btnDescargar" onclick="descargarFotoConMarco()">Descargar Foto</button>
+            <button id="btnExportarTotal" onclick="exportarImagenCompuesta()">Exportar Resumen</button>
         </div>
 
       </div>
@@ -102,6 +105,8 @@
       Volver a editar
     </button>
   </div>
+  
+  <canvas id="finalCanvas" style="display:none;"></canvas>
 
   <script src="main.js"></script>
 </body>
