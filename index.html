@@ -11,18 +11,10 @@
     <h1>Juego Interbank 2026</h1>
 
     <label for="representante">Nombre del representante:</label>
-    <input
-      type="text"
-      id="representante"
-      placeholder="Ingresa tu nombre"
-    />
+    <input type="text" id="representante" placeholder="Ingresa tu nombre" />
 
     <label for="equipo">Nombre del equipo:</label>
-    <input
-      type="text"
-      id="equipo"
-      placeholder="Ej: Los Visionarios"
-    />
+    <input type="text" id="equipo" placeholder="Ej: Los Visionarios" />
 
     <label for="vp">Selecciona tu VP:</label>
     <select id="vp">
@@ -37,16 +29,24 @@
     <div class="instrucciones">
       <strong>Instrucciones:</strong><br />
       Este juego es un acróstico con colores Interbank. Tu equipo deberá formar la palabra
-      <strong>INTERBANK</strong> y completar su compromiso como equipo al 2026, asegurándose de que cada frase
+      <strong>INTERBANK</strong> y completar su compromiso al 2026, asegurándose de que cada frase
       empiece con la letra asignada.
     </div>
   </div>
 
+  <!-- JUEGO -->
   <div class="container" id="juego" style="display: none; text-align: center">
     <h1 style="color: #009a44">Acróstico INTERBANK</h1>
     <p id="bienvenidaMsg"></p>
 
-    <div id="acrostico" style="margin-top: 40px">
+    <div class="proposito-box">
+      <p>
+        <strong>Basándonos en el propósito:</strong><br>
+        “Acompañamos a los peruanos a alcanzar sus sueños hoy”
+      </p>
+    </div>
+
+    <div id="acrostico" style="margin-top: 10px">
       <div class="letra" data-letter="I">I</div>
       <div class="letra" data-letter="N1">N</div>
       <div class="letra" data-letter="T">T</div>
@@ -73,6 +73,7 @@
     </div>
   </div>
 
+  <!-- FINAL -->
   <div class="container" id="final" style="display: none; text-align: center">
     <h1 style="color: #009a44">¡Compromiso 2026 Completado!</h1>
     <p>
@@ -81,35 +82,18 @@
     </p>
 
     <div class="content-wrapper">
+      <!-- Resultado del acrostico -->
       <div id="resultadoFinal"></div>
 
-      <div class="camera-side">
-        <video
-          id="camara"
-          autoplay
-          playsinline
-        ></video>
-
-        <button onclick="tomarFoto()" style="margin-top: 10px; max-width: 250px">
-          Tomar foto
-        </button>
-
-        <canvas id="fotoCanvas" style="display: none"></canvas>
-
-        <img
-          id="fotoTomada"
-          style="
-            margin-top: 15px;
-            width: 100%;
-            max-width: 250px;
-            display: none;
-            border-radius: 8px;
-            border: 2px solid #009a44;
-          "
-          alt="Foto del equipo"
-        />
+      <!-- Cámara -->
+      <div class="camera-wrapper">
+        <video id="camara" autoplay playsinline></video>
+        <button id="btnFoto" onclick="tomarFoto()">Tomar foto</button>
+        <canvas id="fotoCanvas" style="display:none"></canvas>
       </div>
-    </div>
+
+    <!-- ⚠️ La imagen tomada VA FUERA, porque se mantiene arriba -->
+    <img id="fotoTomada" alt="Foto del equipo" />
 
     <button onclick="volverAlJuego()" style="margin-top: 30px; background: #333;">
       Volver a editar
