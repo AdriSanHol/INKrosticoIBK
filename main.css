@@ -1,5 +1,5 @@
 /* -------------------------------------------------
-   1) ESTILOS BASE
+    1) ESTILOS BASE
 ------------------------------------------------- */
 body {
   font-family: Arial, sans-serif;
@@ -19,13 +19,12 @@ body {
   border-radius: 16px;
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
   width: 100%;
-  max-width: 700px;
-  transform: translateY(-10px);
+  max-width: 900px;
 }
 
 /* Caja del propósito */
 .proposito-box {
-  background: #009a44;       /* verde IBK */
+  background: #009a44; /* verde IBK */
   color: white;
   padding: 12px 22px;
   border-radius: 12px;
@@ -33,7 +32,7 @@ body {
   text-align: center;
   font-size: 14px;
   line-height: 1.5;
-  box-shadow: 0 3px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.15);
 }
 
 .proposito-box strong {
@@ -44,7 +43,7 @@ h1 {
   color: #009a44;
   text-align: center;
   margin-bottom: 17px;
-    margin-top: 5px; 
+  margin-top: 5px;
 }
 
 label {
@@ -90,15 +89,15 @@ button:hover {
 }
 
 /* -------------------------------------------------
-   2) ACRÓSTICO
+    2) ACRÓSTICO
 ------------------------------------------------- */
 #acrostico {
   display: flex;
   justify-content: center;
-  flex-wrap: nowrap;      /* Que no se bajen */
+  flex-wrap: nowrap; /* Que no se bajen */
   gap: 14px;
-  overflow-x: auto;       /* Por si pantalla pequeña */
-  padding: 20px 10px; 
+  overflow-x: auto; /* Por si pantalla pequeña */
+  padding: 20px 10px;
 }
 
 .letra {
@@ -137,28 +136,26 @@ button:hover {
 }
 
 /* -------------------------------------------------
-   3) PANTALLA FINAL (RESUMEN)
+    3) PANTALLA FINAL (RESUMEN)
 ------------------------------------------------- */
 #final .content-wrapper {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: column; /* Por defecto, apilado en móvil */
+  gap: 30px; 
   margin-top: 20px;
-  gap: 30px;
+  align-items: center; 
 }
 
-/* Acróstico vertical */
 #resultadoFinal {
   font-size: 18px;
   line-height: 2.2;
   text-align: left;
   padding: 20px;
-  max-width: 350px;
-  min-width: 200px;
+  max-width: 100%; 
+  min-width: auto;
   flex-grow: 1;
 }
 
-/* Letra del acróstico vertical */
 #resultadoFinal strong {
   font-size: 22px;
   font-weight: 700;
@@ -166,98 +163,82 @@ button:hover {
 }
 
 /* -------------------------------------------------
-   4) CÁMARA Y FOTO
+    4) CÁMARA Y FOTO (AHORA ES UN WRAPPER DE DOBLE COLUMNA PARA LA CÁMARA/FOTO)
 ------------------------------------------------- */
-
-#camara {
-  width: 100%;
-  height: 100%;
-  border-radius: 10px;
-  object-fit: cover;
-  transition: transform 0.6s ease-in-out;
-}
-.camara-abajo {
-  width: 150px !important;
-  transform: translate(10px, 160px); 
-  border-radius: 5px;
-  opacity: 0.85;
+.camera-container {
+    /* Nuevo contenedor para agrupar Cámara y Foto */
+    display: flex;
+    flex-direction: column; /* Apilado por defecto en móvil */
+    gap: 20px;
+    width: 100%;
+    max-width: 400px; /* Limitar el ancho total en móvil */
 }
 
-.camera-wrapper {
-  width: 180px; 
-  position: relative;
-  top: 0;
-  left: 0;
-  transition: all 0.5s ease;
+/* Estilo para los wrappers individuales (cámara y foto) */
+.camera-wrapper, .foto-display {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
 }
 
-.camera-wrapper.abajo {
-  top: 250px;     /* Más abajo */
-  left: 120px;    /* Más a la derecha */
+/* Estilo común para el video/foto en móvil (un solo cuadrado) */
+#camara, #fotoTomada {
+    width: 100%;
+    height: 250px;
+    border-radius: 10px;
+    object-fit: cover;
 }
 
-/* ---- Imagen capturada ---- */
 #fotoTomada {
-  position: fixed;
-  top: 200px;
-  right: 20px;          /* Se queda arriba a la derecha */
-  width: 420px;
-  border-radius: 12px;
-  display: none;
-  z-index: 9999;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    margin-top: 0; /* Asegurar que no haya margen extra */
 }
+
 
 /* -------------------------------------------------
-   5) MEDIA QUERIES
+    5) MEDIA QUERIES (ESTRUCTURA DE TRES COLUMNAS PRINCIPALES)
 ------------------------------------------------- */
 @media (min-width: 650px) {
-
-  /* Cámara y foto al costado */
+  /* Estructura Principal: Resumen | Cámara/Foto */
   #final .content-wrapper {
-    flex-direction: row;
-    align-items: flex-start;
+    flex-direction: row; 
     justify-content: space-between;
+    align-items: flex-start;
   }
 
-  #camara {
-    width: 180px;
-    height: 100px;
+  /* Estructura Interna: Cámara | Foto */
+  .camera-container {
+    flex-direction: row; /* Cámara y foto una al lado de la otra */
+    gap: 20px;
+    /* Ancho: 200px (Cámara) + 200px (Foto) + 20px (Gap) = 420px */
+    width: 420px; 
+    max-width: 420px; 
+    align-items: flex-start;
   }
 
-  #fotoTomada {
-    max-width: 300px;
+  /* Contenedores de 200px para la cámara y la foto */
+  .camera-wrapper, .foto-display {
+      width: 200px; 
+      min-width: 200px;
+      height: auto;
+      /* Asegurar que el botón de tomar foto no tenga width: 100% del container */
   }
 
-  #final {
-  position: relative;
-  min-height: 90vh;
-}
-
-#final button:last-of-type {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  /* ⭐ Nuevo: controlar tamaño */
-  width: 200px;          /* puedes poner 180, 220, lo que quieras */
-  max-width: 80%;        /* opcional, por si pantalla es chica */
-  padding: 10px 20px;
-}
-
-}
-
-@media (min-width: 900px) {
-  #camara {
-    height: 320px;
+  /* El video y la foto deben ser cuadrados de 200px */
+  #camara, #fotoTomada {
+    width: 200px;
+    height: 200px;
   }
   
-}
+  /* El botón dentro del wrapper de 200px debe ocupar ese ancho */
+  .camera-wrapper button, .foto-display button {
+      width: 100%; /* Ocupa los 200px del contenedor padre */
+      margin-top: 0;
+  }
 
-@media (min-width: 900px) {
-  .camera-wrapper {
-    width: 320px;
-    height: 240px;
+  /* El resultado final (acróstico) ocupa el espacio restante */
+  #resultadoFinal {
+    max-width: 450px;
+    padding: 15px 0;
   }
 }

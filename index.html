@@ -34,7 +34,6 @@
     </div>
   </div>
 
-  <!-- JUEGO -->
   <div class="container" id="juego" style="display: none; text-align: center">
     <h1 style="color: #009a44">Acróstico INTERBANK</h1>
     <p id="bienvenidaMsg"></p>
@@ -73,7 +72,6 @@
     </div>
   </div>
 
-  <!-- FINAL -->
   <div class="container" id="final" style="display: none; text-align: center">
     <h1 style="color: #009a44">¡Compromiso 2026 Completado!</h1>
     <p>
@@ -82,19 +80,24 @@
     </p>
 
     <div class="content-wrapper">
-      <!-- Resultado del acrostico -->
       <div id="resultadoFinal"></div>
 
-      <!-- Cámara -->
-      <div class="camera-wrapper">
-        <video id="camara" autoplay playsinline></video>
-        <button id="btnFoto" onclick="tomarFoto()">Tomar foto</button>
-        <canvas id="fotoCanvas" style="display:none"></canvas>
+      <div class="camera-container">
+        
+        <div class="camera-wrapper">
+          <video id="camara" autoplay playsinline></video>
+          <canvas id="fotoCanvas" style="display:none"></canvas>
+          <button id="btnFoto" onclick="tomarFoto()">Tomar foto</button>
+        </div>
+
+        <div class="foto-display" id="fotoDisplay" style="display:none;">
+            <img id="fotoTomada" alt="Foto del equipo" />
+            <button id="btnDescargar" onclick="descargarFoto()">Descargar Foto</button>
+        </div>
+
       </div>
-
-    <!-- ⚠️ La imagen tomada VA FUERA, porque se mantiene arriba -->
-    <img id="fotoTomada" alt="Foto del equipo" />
-
+    </div>
+    
     <button onclick="volverAlJuego()" style="margin-top: 30px; background: #333;">
       Volver a editar
     </button>

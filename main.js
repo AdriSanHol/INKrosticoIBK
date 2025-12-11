@@ -114,10 +114,11 @@ function mostrarResumenFinal() {
 // Activar cámara
 function activarCamara() {
   const video = document.getElementById("camara");
-
-  // Asegurar que la imagen tomada previamente no esté visible
-  document.getElementById("fotoTomada").style.display = "none";
-  video.style.display = "block"; // Mostrar el video
+  const fotoDisplay = document.getElementById("fotoDisplay");
+  
+  // Ocultar la foto tomada (Cuadrado 2)
+  fotoDisplay.style.display = "none";
+  video.style.display = "block"; // Mostrar el video (Cuadrado 1)
 
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({ video: true })
@@ -143,6 +144,7 @@ function tomarFoto() {
   const video = document.getElementById("camara");
   const canvas = document.getElementById("fotoCanvas");
   const img = document.getElementById("fotoTomada");
+  const fotoDisplay = document.getElementById("fotoDisplay");
 
   if (video.readyState !== 4) {
     alert("La cámara no está lista.");
@@ -157,10 +159,24 @@ function tomarFoto() {
   ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
   img.src = canvas.toDataURL("image/png");
-  img.style.display = "block";
+  
+  // Mostrar el contenedor de la foto tomada (Cuadrado 2)
+  // Usamos 'flex' para mantener la alineación vertical de la imagen y el botón
+  if (window.innerWidth >= 650) {
+      fotoDisplay.style.display = 'flex'; // Usar flex en pantallas grandes
+  } else {
+      // En móvil, la estructura sigue siendo apilada, pero la foto debe aparecer
+      fotoDisplay.style.display = 'flex'; 
+  }
+}
 
-  // 🔥 Animaciones:
-  document.querySelector(".camera-wrapper").classList.add("abajo");
+// Función para descargar la imagen
+function descargarFoto() {
+  const img = document.getElementById('fotoTomada');
+  const link = document.createElement('a');
+  link.href = img.src;
+  link.download = 'foto_interbank_2026.png'; // Nombre del archivo a descargar
+  link.click();
 }
 
 // Volver a editar
@@ -183,6 +199,7 @@ window.guardarLetra = guardarLetra;
 window.mostrarResumenFinal = mostrarResumenFinal;
 window.tomarFoto = tomarFoto;
 window.volverAlJuego = volverAlJuego;
+window.descargarFoto = descargarFoto;
 
 // Inicializar event listeners después de cargar el DOM
 document.addEventListener('DOMContentLoaded', () => {
