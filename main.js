@@ -139,18 +139,17 @@ function activarCamara() {
   }
 }
 
-// Tomar foto
 function tomarFoto() {
   const video = document.getElementById("camara");
   const canvas = document.getElementById("fotoCanvas");
   const img = document.getElementById("fotoTomada");
 
-  // readyState 4 = HAVE_ENOUGH_DATA
   if (video.readyState !== 4) {
-    alert("La cámara no está lista o no fue activada correctamente.");
+    alert("La cámara no está lista.");
     return;
   }
 
+  // Pasar lo que se ve en el video al canvas
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
 
@@ -160,9 +159,8 @@ function tomarFoto() {
   img.src = canvas.toDataURL("image/png");
   img.style.display = "block";
 
-  // Opcional: Pausar el video después de tomar la foto
-  // const tracks = video.srcObject?.getTracks();
-  // tracks?.forEach(track => track.stop());
+  // 🔥 Animaciones:
+  document.querySelector(".camera-wrapper").classList.add("abajo");
 }
 
 // Volver a editar
