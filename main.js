@@ -215,33 +215,39 @@ function exportarImagenCompuesta() {
         return;
     }
 
-    const W_IMG = 350; // Ancho de la foto final
-    const H_IMG = 350; // Alto de la foto final
-    const MARGIN = 40;
-    const CANVAS_W = 1100; // Ancho total para acomodar el texto largo y la foto
-    const W_TEXT_AREA = CANVAS_W - W_IMG - MARGIN * 3; // Ancho disponible para el texto
+    // --- DIMENSIONES Y POSICIONES ---
+    const W_IMG = 450; 
+    const H_IMG = 450;
+    const MARGIN = 40; 
+    const CANVAS_W = 1250; 
+    
+    // Posición ajustada para la foto con marco
+    const X_IMG = CANVAS_W - W_IMG - 60; 
+    const Y_IMG = 100; 
 
     const finalCanvas = document.getElementById('finalCanvas');
     const ctx = finalCanvas.getContext('2d');
     
     // --- Preparar datos para el texto ---
     let lineas = [];
-    lineas.push(`Compromiso 2026 - Equipo: ${equipoStr} (VP ${vpStr})`);
-    lineas.push(`Representante: ${repStr}`);
-    lineas.push(""); 
+    // Las primeras líneas deben dibujarse como "Compromiso 2026", "Equipo:", "Representante:"
+    lineas.push("Compromiso 2026"); 
+    lineas.push(`Equipo: ${equipoStr} (VP ${vpStr})`); 
+    lineas.push(`Representante: ${repStr}`); 
+    lineas.push(""); // Espacio para separar
     
-    // Convertir el HTML del resumen a líneas de texto, extrayendo los fuertes (STRONG)
+    // Procesar el acróstico
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = resumenHTML;
     
     let textoActual = [];
     tempDiv.childNodes.forEach(node => {
-        if (node.nodeType === 1 && node.tagName === 'BR') { // Separador <br>
+        if (node.nodeType === 1 && node.tagName === 'BR') {
             if (textoActual.length > 0) {
                 lineas.push(textoActual);
             }
             textoActual = [];
-        } else if (node.nodeType === 3) { // TEXT_NODE
+        } else if (node.nodeType === 3) {
             let textContent = node.textContent.trim();
             if (textContent) textoActual.push({ text: textContent, style: 'normal' });
         } else if (node.tagName === 'STRONG') {
@@ -252,74 +258,65 @@ function exportarImagenCompuesta() {
         lineas.push(textoActual);
     }
 
-    // --- Cargar las imágenes ---
+    // --- Cargar las TRES imágenes ---
     const imgFoto = new Image();
     const imgMarco = new Image();
+    const imgFondo = new Image();
     let imagesLoaded = 0;
 
     const checkLoad = () => {
         imagesLoaded++;
-        if (imagesLoaded === 2) {
-            drawFinalImage(lineas, imgFoto, imgMarco, ctx, finalCanvas, CANVAS_W, W_IMG, H_IMG, MARGIN, W_TEXT_AREA);
+        if (imagesLoaded === 3) {
+            drawFinalImage(lineas, imgFoto, imgMarco, imgFondo, ctx, finalCanvas, CANVAS_W, W_IMG, H_IMG, MARGIN, X_IMG, Y_IMG);
         }
     };
     
     imgFoto.onload = checkLoad;
     imgMarco.onload = checkLoad;
+    imgFondo.onload = checkLoad; 
 
     imgFoto.src = fotoDataURL;
     imgMarco.src = "marcos.png";
+    imgFondo.src = "fondo.png";
 }
 
-function drawFinalImage(lineas, imgFoto, imgMarco, ctx, finalCanvas, CANVAS_W, W_IMG, H_IMG, MARGIN, W_TEXT_AREA) {
-    const FONT_SIZE = 22;
-    const LINE_HEIGHT = FONT_SIZE * 1.5;
-    
-    // Calcular altura total necesaria para acomodar todo el texto con saltos de línea
-    let tempCanvasHeight = MARGIN + LINE_HEIGHT;
-    lineas.forEach(line => {
-        if (Array.isArray(line)) {
-            // Asumiendo que las líneas del acróstico no se envuelven (no hay word-wrap en canvas simple)
-            tempCanvasHeight += LINE_HEIGHT;
-        } else {
-            // Líneas de título, pueden ser largas
-            const metrics = ctx.measureText(line);
-            // Si la línea es más larga que el área de texto, contamos más líneas. 
-            // Esto es una simplificación, ya que word-wrap es complejo en canvas.
-            tempCanvasHeight += LINE_HEIGHT; 
-        }
-    });
-    
-    // Altura total: Máximo entre la altura calculada para el texto y la altura de la foto + márgenes
-    const H_CONTENT = Math.max(tempCanvasHeight, H_IMG + MARGIN * 2);
-    const CANVAS_H = H_CONTENT;
+function drawFinalImage(lineas, imgFoto, imgMarco, imgFondo, ctx, finalCanvas, CANVAS_W, W_IMG, H_IMG, MARGIN, X_IMG, Y_IMG) {
+    const FONT_SIZE = 24; 
+    const LINE_HEIGHT = FONT_SIZE * 1.6;
+    const H_FONDO = 800; 
 
     finalCanvas.width = CANVAS_W;
-    finalCanvas.height = CANVAS_H;
+    finalCanvas.height = H_FONDO; 
 
-    // 1. Fondo Blanco
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    // 1. DIBUJAR EL FONDO
+    ctx.drawImage(imgFondo, 0, 0, CANVAS_W, H_FONDO); 
     
-    // 2. Dibujar la Foto con Marco (a la derecha)
-    const X_IMG = CANVAS_W - W_IMG - MARGIN;
-    const Y_IMG = MARGIN; // Siempre comienza en el margen superior
-
+    // 2. Dibujar la Foto con Marco
     ctx.drawImage(imgFoto, X_IMG, Y_IMG, W_IMG, H_IMG);
     ctx.drawImage(imgMarco, X_IMG, Y_IMG, W_IMG, H_IMG);
 
-    // 3. Dibujar el Texto (a la izquierda)
-    let y = MARGIN + LINE_HEIGHT;
+    // 3. Dibujar el Texto (Comienza 100px más abajo para el margen)
+    let y = MARGIN + 100; 
     const X_TEXT = MARGIN;
     
     // Lógica de dibujo de texto
-    lineas.forEach(line => {
+    lineas.forEach((line, index) => {
         let x = X_TEXT;
 
         if (!Array.isArray(line)) {
-            // Líneas de Título y meta-información (solo la primera y segunda línea, la tercera es un espacio)
-            ctx.font = `bold ${FONT_SIZE + (line.includes('Compromiso 2026') ? 4 : 0)}px Arial`;
-            ctx.fillStyle = line.includes('Compromiso 2026') ? '#009a44' : '#333';
+            // Líneas de Título, Equipo y Representante (índices 0, 1, 2)
+            
+            // Color de texto: Blanco para el título/metadata (Compromiso, Equipo, Rep)
+            ctx.fillStyle = '#FFFFFF'; 
+
+            if (index === 0) {
+                 // Compromiso 2026
+                ctx.font = `bold ${FONT_SIZE + 4}px Arial`;
+            } else {
+                // Equipo y Representante
+                ctx.font = `bold ${FONT_SIZE}px Arial`;
+            }
+            
             ctx.fillText(line, X_TEXT, y);
         } else {
             // Líneas de Acróstico
@@ -329,18 +326,12 @@ function drawFinalImage(lineas, imgFoto, imgMarco, ctx, finalCanvas, CANVAS_W, W
 
                 if (part.style === 'bold') {
                     ctx.font = `bold ${FONT_SIZE}px Arial`;
-                    ctx.fillStyle = '#007b37';
+                    ctx.fillStyle = '#007b37'; // Color verde IBK
                 } else {
                     ctx.font = `${FONT_SIZE}px Arial`;
-                    ctx.fillStyle = '#333';
+                    ctx.fillStyle = '#FFFFFF'; // Color blanco para el resto del texto
                 }
                 
-                // Si el texto excede el área disponible (simplificado, asumiendo que solo la última parte de la frase puede ser larga)
-                if (x + ctx.measureText(text).width > X_IMG - MARGIN) {
-                    // Si la línea se sale, ajustamos la posición del texto. 
-                    // Para evitar esta complejidad, aseguramos que el contenedor del canvas sea lo suficientemente amplio.
-                }
-
                 ctx.fillText(text, x, y);
                 x += ctx.measureText(text).width;
             });
