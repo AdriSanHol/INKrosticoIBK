@@ -9,359 +9,246 @@ function startGame() {
   const vp = document.getElementById('vp').value;
 
   if (!rep || !eq) {
-    alert("Por favor completa tu nombre de representante y el nombre del equipo antes de continuar.");
+    alert("Completa todos los datos.");
     return;
   }
-
-  // Guardar datos del equipo globalmente
   equipoData = { rep, eq, vp };
-
-  // Ocultar inicio y mostrar juego
   document.getElementById('inicio').style.display = 'none';
   document.getElementById('juego').style.display = 'block';
-
-  // Mensaje de bienvenida con HTML válido
   document.getElementById('bienvenidaMsg').innerHTML =
     `<strong>${rep}</strong>, completa el compromiso de tu equipo <strong>${eq}</strong> (${vp}).`;
 
-  // Asegurar que el botón de finalizar no esté visible al inicio del juego
   const btnFinalizar = document.getElementById('btnFinalizar');
   if (btnFinalizar) btnFinalizar.remove();
 }
 
-// Guardar el texto del compromiso
 function guardarLetra() {
-  if (!letraActiva) {
-    alert("Primero selecciona una letra del acróstico.");
-    return;
-  }
-
+  if (!letraActiva) return alert("Selecciona una letra.");
   const texto = document.getElementById('textoLetra').value.trim();
-  if (!texto) {
-    alert("Escribe un compromiso para esta letra.");
-    return;
-  }
-
+  if (!texto) return alert("Escribe un compromiso.");
+  
   const letraReal = letraActiva.replace(/[0-9]/g, "").toUpperCase();
-
-  // Validación: verificar que el texto empiece con esa letra
   if (!texto.toUpperCase().startsWith(letraReal)) {
-    alert(`Tu compromiso debe empezar con la letra "${letraReal}".`);
-    return;
+    return alert(`Debe empezar con la letra "${letraReal}".`);
   }
 
-  // Guardar compromiso
   compromisos[letraActiva] = texto;
-
-  // marcar letra como completa visualmente
-  const letraDiv = [...document.querySelectorAll('.letra')]
-    .find(l => l.dataset.letter === letraActiva);
-
-  if (letraDiv) {
-    letraDiv.classList.add('completa');
-  }
-
+  const letraDiv = [...document.querySelectorAll('.letra')].find(l => l.dataset.letter === letraActiva);
+  if (letraDiv) letraDiv.classList.add('completa');
   document.getElementById('editor').style.display = 'none';
-
   checkCompleto();
 }
 
-// Verificar si todas las letras están completas
 function checkCompleto() {
   const orden = ["I", "N1", "T", "E", "R", "B", "A", "N2", "K"];
   const completo = orden.every(l => compromisos[l]);
-
   let btnFinalizar = document.getElementById('btnFinalizar');
 
   if (completo && !btnFinalizar) {
-    // Crear el botón de finalizar si todas las letras están completas
     btnFinalizar = document.createElement('button');
     btnFinalizar.id = 'btnFinalizar';
     btnFinalizar.innerText = '¡Todo Listo! Ver Resumen y Foto';
     btnFinalizar.style.marginTop = '25px';
     btnFinalizar.onclick = mostrarResumenFinal;
     document.getElementById('juego').appendChild(btnFinalizar);
-  } else if (!completo && btnFinalizar) {
-    // Eliminar el botón si se borra algún compromiso
-    btnFinalizar.remove();
   }
 }
 
-// Mostrar pantalla final
 function mostrarResumenFinal() {
   document.getElementById('juego').style.display = 'none';
   document.getElementById('final').style.display = 'block';
 
-  // Actualizar datos del equipo en la pantalla final
   document.getElementById('equipoFinal').innerText = equipoData.eq || '';
   document.getElementById('vpFinal').innerText = equipoData.vp || '';
 
   const orden = ["I", "N1", "T", "E", "R", "B", "A", "N2", "K"];
   let html = "";
-
-  // Generar el resumen del acróstico
   orden.forEach(l => {
     const letraReal = l.replace(/[0-9]/g, "").toUpperCase();
     html += `<strong style="color: #007b37;">${letraReal}</strong>: ${compromisos[l]}<br>`;
   });
-
   document.getElementById('resultadoFinal').innerHTML = html;
-
-  // Iniciar la cámara
   activarCamara();
 }
 
-// Activar cámara
 function activarCamara() {
   const video = document.getElementById("camara");
   const fotoDisplay = document.getElementById("fotoDisplay");
-  const marco = document.getElementById("marcoOverlay");
   
-  // Ocultar la foto tomada (Cuadrado 2) y el marco
-  fotoDisplay.style.display = "none";
-  marco.style.display = "none"; 
-  video.style.display = "block"; // Mostrar el video (Cuadrado 1)
+  // Al entrar, ocultamos la columna del medio (Foto) si no hay foto
+  fotoDisplay.style.display = 'none'; 
 
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     navigator.mediaDevices.getUserMedia({ video: true })
       .then(stream => {
-        // Detener cualquier stream anterior (si lo hubiera)
         if (video.srcObject) {
           const tracks = video.srcObject.getTracks();
           tracks.forEach(track => track.stop());
         }
         video.srcObject = stream;
       })
-      .catch(err => {
-        alert("No se pudo acceder a la cámara. Por favor, asegúrate de haber dado permiso. Error: " + err.name);
-        video.style.display = "none"; // Ocultar el reproductor si falla
-      });
-  } else {
-    alert("Tu navegador no soporta el acceso a la cámara.");
-    video.style.display = "none";
+      .catch(err => alert("Error cámara: " + err));
   }
 }
 
 function tomarFoto() {
   const video = document.getElementById("camara");
   const canvas = document.getElementById("fotoCanvas");
-  const img = document.getElementById("fotoTomada");
+  const imgFoto = document.getElementById("fotoTomada");
   const fotoDisplay = document.getElementById("fotoDisplay");
-  const marco = document.getElementById("marcoOverlay");
 
-  if (video.readyState !== 4) {
-    alert("La cámara no está lista.");
-    return;
-  }
+  if (video.readyState !== 4) return;
 
-  // Capturar la imagen
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
+  // Lógica de recorte cuadrado
+  const size = Math.min(video.videoWidth, video.videoHeight);
+  const startX = (video.videoWidth - size) / 2;
+  const startY = (video.videoHeight - size) / 2;
+
+  canvas.width = size;
+  canvas.height = size;
 
   const ctx = canvas.getContext("2d");
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(video, startX, startY, size, size, 0, 0, size, size);
 
-  img.src = canvas.toDataURL("image/png");
+  imgFoto.src = canvas.toDataURL("image/png");
+  imgFoto.style.display = 'block'; 
   
-  // Mostrar el contenedor de la foto tomada (Cuadrado 2) y el marco
+  // AL TOMAR LA FOTO, SE HACE VISIBLE LA COLUMNA DEL MEDIO
   fotoDisplay.style.display = 'flex'; 
-  marco.style.display = 'block'; 
 }
 
-/**
- * Dibuja la foto tomada con el marco superpuesto en un canvas y la descarga.
- */
 function descargarFotoConMarco() {
     const imgFoto = document.getElementById('fotoTomada');
-    const imgMarco = document.getElementById('marcoOverlay');
+    const imgMarco = new Image();
+    imgMarco.src = "marcos.png";
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-
-    // Usar el tamaño de la imagen mostrada
     const size = 600; 
     canvas.width = size;
     canvas.height = size;
 
-    // 1. Dibujar la foto
-    ctx.drawImage(imgFoto, 0, 0, size, size);
-
-    // 2. Dibujar el marco
-    const marco = new Image();
-    marco.onload = () => {
-        ctx.drawImage(marco, 0, 0, size, size);
+    imgMarco.onload = () => {
+        ctx.drawImage(imgFoto, 0, 0, size, size);
+        ctx.drawImage(imgMarco, 0, 0, size, size);
         
-        // 3. Descargar el resultado
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');
         link.download = 'foto_interbank_con_marco.png';
         link.click();
     };
-    marco.src = imgMarco.src;
 }
 
-/**
- * Genera una imagen compuesta que incluye el resumen del acróstico y la foto con marco.
- */
 function exportarImagenCompuesta() {
-    // 1. Obtener datos del acróstico y equipo
     const resumenHTML = document.getElementById('resultadoFinal').innerHTML;
     const fotoDataURL = document.getElementById('fotoTomada').src;
-    const equipoStr = document.getElementById('equipoFinal').innerText;
-    const vpStr = document.getElementById('vpFinal').innerText;
-    const repStr = equipoData.rep || 'Representante Desconocido'; 
-
+    
     if (!fotoDataURL || !compromisos['I']) {
         alert("Primero debes completar el acróstico y tomar la foto.");
         return;
     }
-
-    // --- DIMENSIONES Y POSICIONES ---
-    const W_IMG = 450; 
-    const H_IMG = 450;
-    const MARGIN = 40; 
-    const CANVAS_W = 1250; 
     
-    // Posición ajustada para la foto con marco
+    // Configuración Canvas Final
+    const W_IMG = 550; 
+    const H_IMG = 480; 
+    const CANVAS_W = 1250;
+    const H_FONDO = 800;
+    const MARGIN = 40;
+    
+    // Posición Imagen
     const X_IMG = CANVAS_W - W_IMG - 60; 
-    const Y_IMG = 100; 
+    const Y_IMG = 80; 
 
     const finalCanvas = document.getElementById('finalCanvas');
+    finalCanvas.width = CANVAS_W;
+    finalCanvas.height = H_FONDO;
     const ctx = finalCanvas.getContext('2d');
     
-    // --- Preparar datos para el texto ---
+    // Preparar Texto
     let lineas = [];
-    // Las primeras líneas deben dibujarse como "Compromiso 2026", "Equipo:", "Representante:"
     lineas.push("Compromiso 2026"); 
-    lineas.push(`Equipo: ${equipoStr} (VP ${vpStr})`); 
-    lineas.push(`Representante: ${repStr}`); 
-    lineas.push(""); // Espacio para separar
-    
-    // Procesar el acróstico
+    lineas.push(`Equipo: ${equipoData.eq} (VP ${equipoData.vp})`); 
+    lineas.push(`Representante: ${equipoData.rep}`); 
+    lineas.push(""); 
+
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = resumenHTML;
     
     let textoActual = [];
     tempDiv.childNodes.forEach(node => {
         if (node.nodeType === 1 && node.tagName === 'BR') {
-            if (textoActual.length > 0) {
-                lineas.push(textoActual);
-            }
+            if (textoActual.length > 0) lineas.push(textoActual);
             textoActual = [];
         } else if (node.nodeType === 3) {
-            let textContent = node.textContent.trim();
-            if (textContent) textoActual.push({ text: textContent, style: 'normal' });
+            let txt = node.textContent.trim();
+            if (txt) textoActual.push({ text: txt, style: 'normal' });
         } else if (node.tagName === 'STRONG') {
             textoActual.push({ text: node.textContent, style: 'bold' });
         }
     });
-    if (textoActual.length > 0) {
-        lineas.push(textoActual);
-    }
+    if (textoActual.length > 0) lineas.push(textoActual);
 
-    // --- Cargar las TRES imágenes ---
-    const imgFoto = new Image();
-    const imgMarco = new Image();
-    const imgFondo = new Image();
-    let imagesLoaded = 0;
+    // Carga de imágenes
+    const imgFoto = new Image(); imgFoto.src = fotoDataURL;
+    const imgMarco = new Image(); imgMarco.src = "marcos.png";
+    const imgFondo = new Image(); imgFondo.src = "fondo.png";
+    
+    let loaded = 0;
+    const check = () => {
+        loaded++;
+        if(loaded === 3) {
+             // 1. Fondo
+             ctx.drawImage(imgFondo, 0, 0, CANVAS_W, H_FONDO);
+             
+             // 2. Foto + Marco
+             ctx.drawImage(imgFoto, X_IMG, Y_IMG, W_IMG, H_IMG);
+             ctx.drawImage(imgMarco, X_IMG, Y_IMG, W_IMG, H_IMG);
+             
+             // 3. Texto
+             let y = MARGIN + 100;
+             const X_TEXT = MARGIN;
+             const FONT_SIZE = 24;
+             
+             lineas.forEach((line, idx) => {
+                 let x = X_TEXT;
+                 const LINE_HEIGHT = FONT_SIZE * 1.6;
 
-    const checkLoad = () => {
-        imagesLoaded++;
-        if (imagesLoaded === 3) {
-            drawFinalImage(lineas, imgFoto, imgMarco, imgFondo, ctx, finalCanvas, CANVAS_W, W_IMG, H_IMG, MARGIN, X_IMG, Y_IMG);
+                 if (!Array.isArray(line)) {
+                     // Títulos en Blanco
+                     ctx.fillStyle = '#FFFFFF';
+                     ctx.font = (idx === 0) ? `bold ${FONT_SIZE + 6}px Arial` : `bold ${FONT_SIZE}px Arial`;
+                     ctx.fillText(line, X_TEXT, y);
+                 } else {
+                     // Acróstico
+                     line.forEach(part => {
+                         ctx.font = part.style === 'bold' ? `bold ${FONT_SIZE}px Arial` : `${FONT_SIZE}px Arial`;
+                         // Letra inicial VERDE, resto BLANCO
+                         ctx.fillStyle = part.style === 'bold' ? '#007b37' : '#FFFFFF';
+                         ctx.fillText(part.text, x, y);
+                         x += ctx.measureText(part.text).width;
+                     });
+                 }
+                 y += LINE_HEIGHT;
+             });
+             
+             // 4. Descargar
+             const link = document.createElement('a');
+             link.href = finalCanvas.toDataURL('image/png');
+             link.download = 'compromiso_final.png';
+             link.click();
         }
     };
     
-    imgFoto.onload = checkLoad;
-    imgMarco.onload = checkLoad;
-    imgFondo.onload = checkLoad; 
-
-    imgFoto.src = fotoDataURL;
-    imgMarco.src = "marcos.png";
-    imgFondo.src = "fondo.png";
+    imgFoto.onload = check;
+    imgMarco.onload = check;
+    imgFondo.onload = check;
 }
 
-function drawFinalImage(lineas, imgFoto, imgMarco, imgFondo, ctx, finalCanvas, CANVAS_W, W_IMG, H_IMG, MARGIN, X_IMG, Y_IMG) {
-    const FONT_SIZE = 24; 
-    const LINE_HEIGHT = FONT_SIZE * 1.6;
-    const H_FONDO = 800; 
-
-    finalCanvas.width = CANVAS_W;
-    finalCanvas.height = H_FONDO; 
-
-    // 1. DIBUJAR EL FONDO
-    ctx.drawImage(imgFondo, 0, 0, CANVAS_W, H_FONDO); 
-    
-    // 2. Dibujar la Foto con Marco
-    ctx.drawImage(imgFoto, X_IMG, Y_IMG, W_IMG, H_IMG);
-    ctx.drawImage(imgMarco, X_IMG, Y_IMG, W_IMG, H_IMG);
-
-    // 3. Dibujar el Texto (Comienza 100px más abajo para el margen)
-    let y = MARGIN + 100; 
-    const X_TEXT = MARGIN;
-    
-    // Lógica de dibujo de texto
-    lineas.forEach((line, index) => {
-        let x = X_TEXT;
-
-        if (!Array.isArray(line)) {
-            // Líneas de Título, Equipo y Representante (índices 0, 1, 2)
-            
-            // Color de texto: Blanco para el título/metadata (Compromiso, Equipo, Rep)
-            ctx.fillStyle = '#FFFFFF'; 
-
-            if (index === 0) {
-                 // Compromiso 2026
-                ctx.font = `bold ${FONT_SIZE + 4}px Arial`;
-            } else {
-                // Equipo y Representante
-                ctx.font = `bold ${FONT_SIZE}px Arial`;
-            }
-            
-            ctx.fillText(line, X_TEXT, y);
-        } else {
-            // Líneas de Acróstico
-            line.forEach(part => {
-                let text = part.text.trim();
-                if (!text) return;
-
-                if (part.style === 'bold') {
-                    ctx.font = `bold ${FONT_SIZE}px Arial`;
-                    ctx.fillStyle = '#007b37'; // Color verde IBK
-                } else {
-                    ctx.font = `${FONT_SIZE}px Arial`;
-                    ctx.fillStyle = '#FFFFFF'; // Color blanco para el resto del texto
-                }
-                
-                ctx.fillText(text, x, y);
-                x += ctx.measureText(text).width;
-            });
-        }
-        
-        y += LINE_HEIGHT;
-    });
-
-    // 4. Descargar la imagen final
-    const link = document.createElement('a');
-    link.href = finalCanvas.toDataURL('image/png');
-    link.download = `compromiso_interbank_${equipoData.eq}_final.png`;
-    link.click();
-}
-
-// Volver a editar
 function volverAlJuego() {
   document.getElementById('final').style.display = 'none';
   document.getElementById('juego').style.display = 'block';
-
-  // Detener el stream de la cámara al volver a la pantalla de edición
-  const video = document.getElementById("camara");
-  if (video.srcObject) {
-    const tracks = video.srcObject.getTracks();
-    tracks.forEach(track => track.stop());
-    video.srcObject = null;
-  }
 }
 
-// Exportar funciones para que sean accesibles desde el HTML
 window.startGame = startGame;
 window.guardarLetra = guardarLetra;
 window.mostrarResumenFinal = mostrarResumenFinal;
@@ -370,16 +257,13 @@ window.volverAlJuego = volverAlJuego;
 window.descargarFotoConMarco = descargarFotoConMarco; 
 window.exportarImagenCompuesta = exportarImagenCompuesta; 
 
-// Inicializar event listeners después de cargar el DOM
 document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.letra').forEach(l => {
     l.addEventListener('click', () => {
       letraActiva = l.dataset.letter;
       const letraReal = letraActiva.replace(/[0-9]/g, "").toUpperCase();
-
       document.getElementById('editor').style.display = 'block';
-      document.getElementById('editorTitulo').innerText =
-        `Compromiso para la letra "${letraReal}"`;
+      document.getElementById('editorTitulo').innerText = `Compromiso para "${letraReal}"`;
       document.getElementById('textoLetra').value = compromisos[letraActiva] || "";
       document.getElementById('textoLetra').focus();
     });

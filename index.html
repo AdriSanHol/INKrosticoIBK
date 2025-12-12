@@ -29,8 +29,7 @@
     <div class="instrucciones">
       <strong>Instrucciones:</strong><br />
       Este juego es un acróstico con colores Interbank. Tu equipo deberá formar la palabra
-      <strong>INTERBANK</strong> y completar su compromiso al 2026, asegurándose de que cada frase
-      empiece con la letra asignada.
+      <strong>INTERBANK</strong> y completar su compromiso al 2026.
     </div>
   </div>
 
@@ -57,17 +56,9 @@
       <div class="letra" data-letter="K">K</div>
     </div>
 
-    <p style="margin-top: 15px; font-size: 14px">
-      Haz clic en cada letra para completar el compromiso 2026.
-    </p>
-
     <div id="editor" style="margin-top: 20px; display: none">
       <h3 id="editorTitulo" style="color: #333; margin-bottom: 10px;"></h3>
-      <textarea
-        id="textoLetra"
-        style="width: 100%; height: 80px; border-radius: 10px; padding: 10px"
-        placeholder="Escribe el compromiso que inicia con esta letra..."
-      ></textarea>
+      <textarea id="textoLetra" style="width: 100%; height: 80px; border-radius: 10px; padding: 10px"></textarea>
       <button style="margin-top: 10px" onclick="guardarLetra()">Guardar Compromiso</button>
     </div>
   </div>
@@ -80,25 +71,29 @@
     </p>
 
     <div class="content-wrapper">
+      
       <div id="resultadoFinal"></div>
 
-      <div class="camera-container">
-        
-        <div class="camera-wrapper">
-          <video id="camara" autoplay playsinline></video>
+      <div class="foto-display" id="fotoDisplay" style="display:none;">
+          <h3 style="margin: 0 0 10px 0; color:#009a44;">Foto Final</h3>
+          <div class="square-frame">
+              <img id="fotoTomada" alt="Foto del equipo" />
+              <img src="marcos.png" class="overlay-frame" alt="Marco" />
+          </div>
+          <button id="btnDescargar" onclick="descargarFotoConMarco()">Descargar Foto</button>
+          <button id="btnExportarTotal" onclick="exportarImagenCompuesta()">Exportar Resumen</button>
+      </div>
+
+      <div class="camera-wrapper">
+          <h3 style="margin: 0 0 10px 0; color:#333;">Cámara</h3>
+          <div class="square-frame">
+              <video id="camara" autoplay playsinline></video>
+              <img src="marcos.png" class="overlay-frame" alt="Marco" />
+          </div>
           <canvas id="fotoCanvas" style="display:none"></canvas> 
           <button id="btnFoto" onclick="tomarFoto()">Tomar foto</button>
-        </div>
-
-        <div class="foto-display" id="fotoDisplay" style="display:none;">
-            <img id="fotoTomada" alt="Foto del equipo" />
-            <img id="marcoOverlay" src="marcos.png" alt="Marco" style="display:none;" />
-            
-            <button id="btnDescargar" onclick="descargarFotoConMarco()">Descargar Foto</button>
-            <button id="btnExportarTotal" onclick="exportarImagenCompuesta()">Exportar Resumen</button>
-        </div>
-
       </div>
+
     </div>
     
     <button onclick="volverAlJuego()" style="margin-top: 30px; background: #333;">
