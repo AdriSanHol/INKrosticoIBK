@@ -1,7 +1,51 @@
-// Almacenamiento de datos del juego
+// ==========================================
+// 1. CONFIGURACIÓN Y ESTADO
+// ==========================================
+const API_URL = "https://json-server-inkrosticoibk.onrender.com/registros"; // Tu servidor en Render
 const compromisos = {};
 let letraActiva = null;
-let equipoData = {};
+let equipoData = {}; // Datos en memoria para la sesión actual
+
+/**
+ * Guarda el registro inicial en el servidor (POST)
+ */
+function guardarRegistroInicial(id, representante, equipo, vp, fecha) {
+    const nuevoRegistro = {
+        id: id,
+        representante: representante,
+        equipo: equipo,
+        vp: vp, // Agregamos VP al registro
+        fecha_ingreso: fecha,
+        compromisos: null // Se llenará al final
+    };
+
+    fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(nuevoRegistro)
+    })
+    .then(response => response.json())
+    .then(data => console.log("✅ Registro guardado en Render:", data))
+    .catch(error => console.error("❌ Error al guardar registro:", error));
+}
+
+/**
+ * Actualiza el registro con los compromisos al finalizar (PATCH)
+ */
+function actualizarRegistroConCompromisos(id, listaCompromisos) {
+    fetch(`${API_URL}/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ compromisos: listaCompromisos })
+    })
+    .then(response => response.json())
+    .then(data => console.log("✅ Compromisos actualizados en Render:", data))
+    .catch(error => console.error("❌ Error al actualizar compromisos:", error));
+}
+
+// ==========================================
+// 2. LÓGICA DEL JUEGO (INPUTS Y VALIDACIÓN)
+// ==========================================
 
 function startGame() {
   const rep = document.getElementById('representante').value.trim();
@@ -9,12 +53,24 @@ function startGame() {
   const vp = document.getElementById('vp').value;
 
   if (!rep || !eq) {
-    alert("Completa todos los datos.");
+    alert("Por favor completa tu nombre de representante y el nombre del equipo antes de continuar.");
     return;
   }
-  equipoData = { rep, eq, vp };
+
+  // Generar ID único (String) y Fecha
+  const id = Date.now().toString(); 
+  const fechaIngreso = new Date().toLocaleString();
+
+  // Guardar en memoria local del JS
+  equipoData = { rep, eq, vp, id };
+
+  // --- GUARDAR EN SERVIDOR ---
+  guardarRegistroInicial(id, rep, eq, vp, fechaIngreso);
+
+  // Cambio de Pantalla
   document.getElementById('inicio').style.display = 'none';
   document.getElementById('juego').style.display = 'block';
+
   document.getElementById('bienvenidaMsg').innerHTML =
     `<strong>${rep}</strong>, completa el compromiso de tu equipo <strong>${eq}</strong> (${vp}).`;
 
@@ -23,25 +79,42 @@ function startGame() {
 }
 
 function guardarLetra() {
-  if (!letraActiva) return alert("Selecciona una letra.");
+  if (!letraActiva) {
+    alert("Primero selecciona una letra del acróstico.");
+    return;
+  }
+
   const texto = document.getElementById('textoLetra').value.trim();
-  if (!texto) return alert("Escribe un compromiso.");
-  
+  if (!texto) {
+    alert("Escribe un compromiso para esta letra.");
+    return;
+  }
+
   const letraReal = letraActiva.replace(/[0-9]/g, "").toUpperCase();
+
   if (!texto.toUpperCase().startsWith(letraReal)) {
-    return alert(`Debe empezar con la letra "${letraReal}".`);
+    alert(`Tu compromiso debe empezar con la letra "${letraReal}".`);
+    return;
   }
 
   compromisos[letraActiva] = texto;
-  const letraDiv = [...document.querySelectorAll('.letra')].find(l => l.dataset.letter === letraActiva);
-  if (letraDiv) letraDiv.classList.add('completa');
+
+  const letraDiv = [...document.querySelectorAll('.letra')]
+    .find(l => l.dataset.letter === letraActiva);
+
+  if (letraDiv) {
+    letraDiv.classList.add('completa');
+  }
+
   document.getElementById('editor').style.display = 'none';
+
   checkCompleto();
 }
 
 function checkCompleto() {
   const orden = ["I", "N1", "T", "E", "R", "B", "A", "N2", "K"];
   const completo = orden.every(l => compromisos[l]);
+
   let btnFinalizar = document.getElementById('btnFinalizar');
 
   if (completo && !btnFinalizar) {
@@ -51,10 +124,17 @@ function checkCompleto() {
     btnFinalizar.style.marginTop = '25px';
     btnFinalizar.onclick = mostrarResumenFinal;
     document.getElementById('juego').appendChild(btnFinalizar);
+  } else if (!completo && btnFinalizar) {
+    btnFinalizar.remove();
   }
 }
 
 function mostrarResumenFinal() {
+  // --- ACTUALIZAR EN SERVIDOR ---
+  if (equipoData.id) {
+      actualizarRegistroConCompromisos(equipoData.id, compromisos);
+  }
+
   document.getElementById('juego').style.display = 'none';
   document.getElementById('final').style.display = 'block';
 
@@ -63,19 +143,25 @@ function mostrarResumenFinal() {
 
   const orden = ["I", "N1", "T", "E", "R", "B", "A", "N2", "K"];
   let html = "";
+
   orden.forEach(l => {
     const letraReal = l.replace(/[0-9]/g, "").toUpperCase();
     html += `<strong style="color: #007b37;">${letraReal}</strong>: ${compromisos[l]}<br>`;
   });
+
   document.getElementById('resultadoFinal').innerHTML = html;
+
   activarCamara();
 }
+
+// ==========================================
+// 3. CÁMARA Y PROCESAMIENTO DE IMAGEN
+// ==========================================
 
 function activarCamara() {
   const video = document.getElementById("camara");
   const fotoDisplay = document.getElementById("fotoDisplay");
   
-  // Al entrar, ocultamos la columna del medio (Foto) si no hay foto
   fotoDisplay.style.display = 'none'; 
 
   if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
@@ -87,7 +173,11 @@ function activarCamara() {
         }
         video.srcObject = stream;
       })
-      .catch(err => alert("Error cámara: " + err));
+      .catch(err => {
+        alert("No se pudo acceder a la cámara. Error: " + err.name);
+      });
+  } else {
+    alert("Tu navegador no soporta el acceso a la cámara.");
   }
 }
 
@@ -99,7 +189,6 @@ function tomarFoto() {
 
   if (video.readyState !== 4) return;
 
-  // Lógica de recorte cuadrado
   const size = Math.min(video.videoWidth, video.videoHeight);
   const startX = (video.videoWidth - size) / 2;
   const startY = (video.videoHeight - size) / 2;
@@ -113,7 +202,6 @@ function tomarFoto() {
   imgFoto.src = canvas.toDataURL("image/png");
   imgFoto.style.display = 'block'; 
   
-  // AL TOMAR LA FOTO, SE HACE VISIBLE LA COLUMNA DEL MEDIO
   fotoDisplay.style.display = 'flex'; 
 }
 
@@ -139,6 +227,10 @@ function descargarFotoConMarco() {
     };
 }
 
+// ==========================================
+// 4. EXPORTACIÓN DE RESUMEN (CANVAS FINAL)
+// ==========================================
+
 function exportarImagenCompuesta() {
     const resumenHTML = document.getElementById('resultadoFinal').innerHTML;
     const fotoDataURL = document.getElementById('fotoTomada').src;
@@ -147,15 +239,13 @@ function exportarImagenCompuesta() {
         alert("Primero debes completar el acróstico y tomar la foto.");
         return;
     }
-    
-    // Configuración Canvas Final
+
     const W_IMG = 550; 
-    const H_IMG = 480; 
+    const H_IMG = 550; 
     const CANVAS_W = 1250;
     const H_FONDO = 800;
     const MARGIN = 40;
     
-    // Posición Imagen
     const X_IMG = CANVAS_W - W_IMG - 60; 
     const Y_IMG = 80; 
 
@@ -164,7 +254,6 @@ function exportarImagenCompuesta() {
     finalCanvas.height = H_FONDO;
     const ctx = finalCanvas.getContext('2d');
     
-    // Preparar Texto
     let lineas = [];
     lineas.push("Compromiso 2026"); 
     lineas.push(`Equipo: ${equipoData.eq} (VP ${equipoData.vp})`); 
@@ -188,65 +277,83 @@ function exportarImagenCompuesta() {
     });
     if (textoActual.length > 0) lineas.push(textoActual);
 
-    // Carga de imágenes
-    const imgFoto = new Image(); imgFoto.src = fotoDataURL;
-    const imgMarco = new Image(); imgMarco.src = "marcos.png";
-    const imgFondo = new Image(); imgFondo.src = "fondo.png";
-    
-    let loaded = 0;
-    const check = () => {
-        loaded++;
-        if(loaded === 3) {
-             // 1. Fondo
-             ctx.drawImage(imgFondo, 0, 0, CANVAS_W, H_FONDO);
-             
-             // 2. Foto + Marco
-             ctx.drawImage(imgFoto, X_IMG, Y_IMG, W_IMG, H_IMG);
-             ctx.drawImage(imgMarco, X_IMG, Y_IMG, W_IMG, H_IMG);
-             
-             // 3. Texto
-             let y = MARGIN + 100;
-             const X_TEXT = MARGIN;
-             const FONT_SIZE = 24;
-             
-             lineas.forEach((line, idx) => {
-                 let x = X_TEXT;
-                 const LINE_HEIGHT = FONT_SIZE * 1.6;
+    const imgFoto = new Image();
+    const imgMarco = new Image();
+    const imgFondo = new Image();
+    let imagesLoaded = 0;
 
-                 if (!Array.isArray(line)) {
-                     // Títulos en Blanco
-                     ctx.fillStyle = '#FFFFFF';
-                     ctx.font = (idx === 0) ? `bold ${FONT_SIZE + 6}px Arial` : `bold ${FONT_SIZE}px Arial`;
-                     ctx.fillText(line, X_TEXT, y);
-                 } else {
-                     // Acróstico
-                     line.forEach(part => {
-                         ctx.font = part.style === 'bold' ? `bold ${FONT_SIZE}px Arial` : `${FONT_SIZE}px Arial`;
-                         // Letra inicial VERDE, resto BLANCO
-                         ctx.fillStyle = part.style === 'bold' ? '#007b37' : '#FFFFFF';
-                         ctx.fillText(part.text, x, y);
-                         x += ctx.measureText(part.text).width;
-                     });
-                 }
-                 y += LINE_HEIGHT;
-             });
-             
-             // 4. Descargar
-             const link = document.createElement('a');
-             link.href = finalCanvas.toDataURL('image/png');
-             link.download = 'compromiso_final.png';
-             link.click();
+    const checkLoad = () => {
+        imagesLoaded++;
+        if (imagesLoaded === 3) {
+            drawFinalImage(lineas, imgFoto, imgMarco, imgFondo, ctx, finalCanvas, CANVAS_W, W_IMG, H_IMG, MARGIN, X_IMG, Y_IMG);
         }
     };
     
-    imgFoto.onload = check;
-    imgMarco.onload = check;
-    imgFondo.onload = check;
+    imgFoto.onload = checkLoad;
+    imgMarco.onload = checkLoad;
+    imgFondo.onload = checkLoad; 
+
+    imgFoto.src = fotoDataURL;
+    imgMarco.src = "marcos.png";
+    imgFondo.src = "fondo.png";
+}
+
+function drawFinalImage(lineas, imgFoto, imgMarco, imgFondo, ctx, finalCanvas, CANVAS_W, W_IMG, H_IMG, MARGIN, X_IMG, Y_IMG) {
+    ctx.drawImage(imgFondo, 0, 0, CANVAS_W, finalCanvas.height);
+    
+    ctx.drawImage(imgFoto, X_IMG, Y_IMG, W_IMG, H_IMG);
+    ctx.drawImage(imgMarco, X_IMG, Y_IMG, W_IMG, H_IMG);
+    
+    let y = MARGIN + 100; 
+    const X_TEXT = MARGIN;
+    const FONT_SIZE = 24;
+    
+    lineas.forEach((line, index) => {
+        let x = X_TEXT;
+        const LINE_HEIGHT = FONT_SIZE * 1.6;
+
+        if (!Array.isArray(line)) {
+            ctx.fillStyle = '#FFFFFF'; 
+            if (index === 0) ctx.font = `bold ${FONT_SIZE + 4}px Arial`;
+            else ctx.font = `bold ${FONT_SIZE}px Arial`;
+            
+            ctx.fillText(line, X_TEXT, y);
+        } else {
+            line.forEach(part => {
+                let text = part.text.trim();
+                if (!text) return;
+
+                if (part.style === 'bold') {
+                    ctx.font = `bold ${FONT_SIZE}px Arial`;
+                    ctx.fillStyle = '#007b37'; 
+                } else {
+                    ctx.font = `${FONT_SIZE}px Arial`;
+                    ctx.fillStyle = '#FFFFFF'; 
+                }
+                
+                ctx.fillText(text, x, y);
+                x += ctx.measureText(text).width;
+            });
+        }
+        y += LINE_HEIGHT;
+    });
+
+    const link = document.createElement('a');
+    link.href = finalCanvas.toDataURL('image/png');
+    link.download = `compromiso_interbank_${equipoData.eq}_final.png`;
+    link.click();
 }
 
 function volverAlJuego() {
   document.getElementById('final').style.display = 'none';
   document.getElementById('juego').style.display = 'block';
+
+  const video = document.getElementById("camara");
+  if (video.srcObject) {
+    const tracks = video.srcObject.getTracks();
+    tracks.forEach(track => track.stop());
+    video.srcObject = null;
+  }
 }
 
 window.startGame = startGame;
