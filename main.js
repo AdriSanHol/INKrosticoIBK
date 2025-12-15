@@ -306,7 +306,7 @@ function drawFinalImage(lineas, imgFoto, imgMarco, imgFondo, ctx, finalCanvas, C
     
     let y = MARGIN + 100; 
     const X_TEXT = MARGIN;
-    const FONT_SIZE = 24;
+    const FONT_SIZE = 32;
     
     lineas.forEach((line, index) => {
         let x = X_TEXT;
